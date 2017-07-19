@@ -24,9 +24,11 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid (mempty)
 import Data.Newtype (class Newtype, unwrap)
 import Data.Options (Options, options)
+import Data.String.Regex (Regex, regex)
+import Data.String.Regex.Flags (noFlags)
 import Data.StrMap (StrMap)
 import Data.StrMap as SM
-import Data.Traversable (traverse)
+import Data.Traversable (traverse, for)
 import Minimist (MinimistOptions, parseArgsForeign)
 import Node.Encoding as Encoding
 import Node.FS (FS)
@@ -42,6 +44,7 @@ type Webhook = { requestMethod :: String
                , request :: NullOrUndefined String
                , incomingPath :: String
                , incomingMethod :: String
+               , exclude :: NullOrUndefined Foreign
                }
 
 readStrMapString :: Foreign -> F (StrMap String)
@@ -53,6 +56,13 @@ readStrMapString obj = do
 webhookRequestHeaders :: ∀ m. (MonadError Error m) => Webhook -> m (StrMap String)
 webhookRequestHeaders hook = convertF $ readStrMapString requestHeaders where
     requestHeaders = fromMaybe (toForeign {}) $ unwrap hook.requestHeaders
+
+webhookExclusions :: ∀ m. (MonadError Error m) => Webhook -> m (StrMap Regex)
+webhookExclusions hook = do
+    m <- convertF $ readStrMapString exclusionsF
+    for m $ either (throwError <<< error) pure <$> flip regex noFlags
+    where
+        exclusionsF = fromMaybe (toForeign {}) $ unwrap hook.exclude
 
 newtype WebhookCfg = WebhookCfg Webhook
 
