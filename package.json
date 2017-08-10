@@ -1,0 +1,28 @@
+{
+  "name": "harbaror2",
+  "version": "0.1.0",
+  "description": "ferryman of webhooks",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcoffin/harbaror2.git"
+  },
+  "author": "Matt Coffin <mcoffin13@gmail.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/mcoffin/harbaror2/issues"
+  },
+  "homepage": "https://github.com/mcoffin/harbaror2#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "js-yaml": "^3.9.1",
+    "lazy.js": "^0.5.0",
+    "lodash": "^4.17.4",
+    "minimist": "^1.2.0",
+    "mustache": "^2.3.0"
+  }
+}
