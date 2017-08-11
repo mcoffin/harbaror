@@ -44,6 +44,9 @@ readConfig(args['config']).then(config => {
         });
     });
     app.use('/webhooks', webhooks);
+    app.get('/health', (req, res) => {
+        res.status(204).end();
+    });
 
     const port = parseInt(config['port'] || '8080', 10);
     http.createServer(app).listen(port, config['bind-address']);
