@@ -29,12 +29,33 @@ function maybeRequest(req, res, view, requestConfig) {
     return Promise.all(promises.toArray());
 }
 
+class View {
+    constructor(req) {
+        this.body = req.body;
+        this.query = req.query;
+        this.headers = req.headers;
+    }
+
+    get combinedView() {
+        let view = {};
+        const components = [
+            this.body,
+            this.query,
+            this.headers
+        ];
+        components.forEach(c => {
+            view = _.merge(view, c);
+        });
+        return view;
+    }
+}
+
 readConfig(args['config']).then(config => {
     const webhooks = express();
     webhooks.use(bodyParser.json());
     Lazy(config.webhooks).each(webhook => {
         webhooks[webhook.hook.method.toLowerCase()](webhook.hook.path, (req, res) => {
-            const view = _.merge(req.body, req.query);
+            const view = new View(req);
             const responses = Lazy(webhook.requests)
                 .map(_.curry(maybeRequest)(req, res, view))
                 .toArray();
