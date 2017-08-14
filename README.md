@@ -16,10 +16,10 @@ webhooks:
         headers:
           'Content-Type': application/json
         path: /v2/room/1234/notification?auth_token=foobar
-        body: "{\"color\":\"green\",\"message_format\":\"html\",\"message\":\"{{message}}: {{#primary_resources}}(<a href=\\\"{{url}}\\\">{{id}}</a>) <b>{{name}}</b>{{/primary_resources}}\"}"
+        body: "{\"color\":\"green\",\"message_format\":\"html\",\"message\":\"{{body.message}}: {{#body.primary_resources}}(<a href=\\\"{{url}}\\\">{{id}}</a>) <b>{{name}}</b>{{/body.primary_resources}}\"}"
         filter:
           - not:
-              query: message
+              query: body.message
               pattern: ".*edited this \\w+$"
     hook:
       path: /pivotal-to-hipchat
@@ -41,7 +41,7 @@ webhooks:
         port: 443
         headers:
           'Content-Type': application/json
-          'X-TrackerToken': "{{root.tracker_token}}"
+          'X-TrackerToken': "{{root.body.tracker_token}}"
         body:
           source_commit:
             commit_id: "{{split.id}}"
@@ -51,10 +51,10 @@ webhooks:
         filter:
           - header: X-Gitlab-Event
             pattern: Push Hook
-          - query: object_kind
+          - query: body.object_kind
             pattern: ^push$
-          - query: ref
+          - query: body.ref
             pattern: master$
         split:
-          query: commits
+          query: body.commits
 ```
