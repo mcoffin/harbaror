@@ -23,7 +23,15 @@ function maybeRequest(req, res, view, requestConfig) {
         });
     }
     const promises = views
-        .filter(v => filters.every(f => f(req, v)))
+        .map(v => {
+            v.filter = Lazy.range(0, filters.length()).map(function () {
+                return {};
+            }).toArray();
+            return v;
+        })
+        .filter(v => {
+            return filters.zip(v.filter).every(([f, fv]) => f(req, v, fv));
+        })
         .map(v => renderAll(v, requestConfig))
         .map(performRequest);
     return Promise.all(promises.toArray());
