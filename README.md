@@ -58,3 +58,24 @@ webhooks:
         split:
           query: body.commits
 ```
+
+## Filter regex dereferencing
+
+```yaml
+webhooks:
+  - requests:
+      - method: POST
+        host: someorganization.hipchat.com
+        port: 443
+        protocol: "https:"
+        headers:
+          'Content-Type': application/json
+        path: /v2/room/1234/notification?auth_token=foobar-token
+        body:
+          color: green
+          message_format: html
+          message: "A {{filter.0.matches.1}} was edited"
+        filter:
+          - query: body.message
+            pattern: ".*edited this (\\w+)$"
+```
