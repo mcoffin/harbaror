@@ -5,7 +5,7 @@ const Lazy = require('lazy.js');
 const _ = require('lodash');
 const { readConfig, makeFilter } = require('./lib/config');
 const { renderAll } = require('./lib/utils');
-const { performRequest } = require('./lib/http');
+const { HttpResponse, performRequest } = require('./lib/http');
 const http = require('http');
 
 var app = express();
@@ -68,7 +68,11 @@ readConfig(args['config']).then(config => {
                 .map(_.curry(maybeRequest)(req, res, view))
                 .toArray();
             Promise.all(responses)
-                .then(() => res.status(200).json("{}"))
+                .then((responses) => {
+                    return res.status(200).json(Lazy(responses).map(response => {
+                        return Lazy(response).map(r => r.summary).toArray();
+                    }).toArray());
+                })
                 .catch(e => res.status(503).json({error: e}));
         });
     });
